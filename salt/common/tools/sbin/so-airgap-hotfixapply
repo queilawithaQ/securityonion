@@ -43,6 +43,7 @@ else
       echo "Checking to see if there are hotfixes needed"
       if [ "$HOTFIXVERSION" == "$CURRENTHOTFIX" ]; then
         echo "You are already running the latest version of Security Onion."
+        rm -rf $HOTFIXDIR
         exit 1
       else
         echo "We need to apply a hotfix"
@@ -50,6 +51,7 @@ else
         rsync -a $HOTFIXDIR/pillar /opt/so/saltstack/default/
         chown -R socore:socore /opt/so/saltstack/default/
         chmod 755 /opt/so/saltstack/default/pillar/firewall/addfirewall.sh
+        echo $HOTFIXVERSION > /etc/sohotfix
         salt-call state.highstate -l info queue=True
         echo "The Hotfix $HOTFIXVERSION has been applied"
         # Clean up 
@@ -58,6 +60,7 @@ else
       fi
     else
       echo "This hotfix is not compatible with your current version. Download the latest ISO and run soup"
+      rm -rf $HOTFIXDIR
     fi
 
   fi
